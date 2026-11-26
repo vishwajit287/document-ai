@@ -1,0 +1,9 @@
+
+PyMuPDF
+langchain-core
+langchain-text-splitters
+python-dotenv
+
+tiktoken
+pytesseract
+Pillow
