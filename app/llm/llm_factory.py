@@ -29,4 +29,7 @@ def get_llm():
         timeout=120
     )
 
-    return llm
+    return ChatOpenAI(
+        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+        temperature=0,
+    )

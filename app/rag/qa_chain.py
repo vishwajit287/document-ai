@@ -42,7 +42,7 @@ class DocumentQAEngine:
         self,
         question: str,
         k: int = 5,
-        source_id: str | None = None
+        source_id: str | None = None,
     ):
 
         # Step 1: Retrieve relevant chunks
@@ -62,7 +62,8 @@ class DocumentQAEngine:
                 "insufficient_information": True,
                 "citations": [],
                 "retrieved_chunks": [],
-                "usage": self.tracker.get_metrics()
+                "usage": self.tracker.get_metrics(),
+                "retrieved_contexts": [],
             }
 
         # Step 2: Build context
@@ -97,6 +98,8 @@ class DocumentQAEngine:
             raise ValueError(
                 "LLM did not return a valid structured response."
             )
+            
+        model_cited_ids = parsed_response.cited_chunk_ids
 
         # Step 4: Validate citations against retrieved chunks
         chunks_by_id = {
@@ -146,10 +149,17 @@ class DocumentQAEngine:
             "retrieved_chunks": [
                 {
                     "chunk_id": chunk["chunk_id"],
+                    "source": chunk["source_name"],
                     "page": chunk["page"],
                     "distance": chunk["distance"]
                 }
                 for chunk in retrieved_chunks
             ],
-            "usage": self.tracker.get_metrics()
+            "usage": self.tracker.get_metrics(),
+            "model_cited_chunk_ids": model_cited_ids,
+            "invalid_cited_chunk_ids": [
+                chunk_id
+                for chunk_id in model_cited_ids
+                if chunk_id not in chunks_by_id
+            ],
         }
